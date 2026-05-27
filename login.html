@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso - PC Builder Simulator</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Google Fonts: Orbitron (Gaming/Futurista) y Outfit (Limpio) -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Outfit:wght@300;400;600;700&display=swap"
+        rel="family">
+
+    <style>
+        :root {
+            --bg-color: #07090f;
+            --card-bg: rgba(10, 12, 22, 0.7);
+            --border-cyan: #00f2fe;
+            --border-purple: #8b5cf6;
+            --text-muted: #94a3b8;
+            --input-bg: #0d111d;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image:
+                radial-gradient(at 10% 20%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 90% 80%, rgba(0, 242, 254, 0.15) 0px, transparent 50%);
+            color: #e2e8f0;
+            font-family: 'Outfit', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* Contenedor Neón Cyber */
+        .cyber-card {
+            background-color: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 500px;
+            padding: 40px;
+            box-shadow:
+                0 20px 50px rgba(0, 0, 0, 0.5),
+                0 0 40px rgba(0, 242, 254, 0.05),
+                inset 0 0 20px rgba(255, 255, 255, 0.02);
+            transition: border-color 0.5s ease, box-shadow 0.5s ease;
+            position: relative;
+        }
+
+        /* Resplandor superior dinámico */
+        .cyber-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--border-cyan), var(--border-purple), transparent);
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.8);
+        }
+
+        /* Icono Decorativo Superior */
+        .icon-header-box {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(0, 242, 254, 0.3));
+            border: 1px solid rgba(0, 242, 254, 0.4);
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: #fff;
+            text-shadow: 0 0 8px rgba(0, 242, 254, 0.5);
+            margin-right: 20px;
+        }
+
+        /* Títulos */
+        .cyber-title {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 1.6rem;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+            color: #fff;
+        }
+
+        .cyber-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+        }
+
+        /* Pestañas (Tabs) */
+        .cyber-tabs {
+            display: flex;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            margin-top: 30px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .cyber-tab-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            padding: 12px 10px;
+            letter-spacing: 1.5px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .cyber-tab-btn:hover {
+            color: #fff;
+        }
+
+        .cyber-tab-btn.active {
+            color: var(--border-cyan);
+            text-shadow: 0 0 10px rgba(0, 242, 254, 0.4);
+        }
+
+        /* Indicador dinámico de pestaña activa */
+        .tab-indicator {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--border-cyan), var(--border-purple));
+            box-shadow: 0 0 10px var(--border-cyan);
+            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .cyber-tabs[data-active="login"] .tab-indicator {
+            transform: translateX(100%);
+        }
+
+        /* Formulario y Animación de cambio */
+        .form-section {
+            display: none;
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Form Inputs */
+        .input-group-label {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.3s;
+        }
+
+        .input-container-custom {
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        .input-container-custom i.input-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .cyber-input {
+            background-color: var(--input-bg);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            color: #fff;
+            padding: 14px 16px 14px 48px;
+            width: 100%;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            outline: none;
+        }
+
+        .cyber-input::placeholder {
+            color: rgba(148, 163, 184, 0.4);
+        }
+
+        .cyber-input:focus {
+            border-color: var(--border-cyan);
+            box-shadow:
+                0 0 15px rgba(0, 242, 254, 0.15),
+                inset 0 0 8px rgba(0, 242, 254, 0.05);
+            background-color: #0f1424;
+        }
+
+        .input-container-custom:focus-within i.input-icon {
+            color: var(--border-cyan);
+            text-shadow: 0 0 8px rgba(0, 242, 254, 0.5);
+        }
+
+        .input-container-custom:focus-within .input-group-label {
+            color: var(--border-cyan);
+        }
+
+        /* Botón Neón */
+        .btn-cyber-submit {
+            background: linear-gradient(90deg, var(--border-purple), var(--border-cyan));
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 0.95rem;
+            letter-spacing: 2px;
+            padding: 15px 20px;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-cyber-submit::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+            transition: all 0.5s ease;
+            z-index: -1;
+        }
+
+        .btn-cyber-submit:hover {
+            transform: translateY(-2px);
+            box-shadow:
+                0 6px 25px rgba(0, 242, 254, 0.4),
+                0 0 15px rgba(139, 92, 246, 0.4);
+            letter-spacing: 3px;
+        }
+
+        .btn-cyber-submit:hover::before {
+            left: 100%;
+        }
+
+        .btn-cyber-submit:active {
+            transform: translateY(1px);
+        }
+
+        /* Links de cambio */
+        .switch-link-container {
+            text-align: center;
+            margin-top: 24px;
+        }
+
+        .switch-link {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .switch-link:hover {
+            color: var(--border-cyan);
+            text-shadow: 0 0 8px rgba(0, 242, 254, 0.3);
+        }
+
+        /* Alertas Premium */
+        .cyber-alert {
+            background-color: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            border-radius: 10px;
+            color: #f87171;
+            font-size: 0.85rem;
+            padding: 12px 16px;
+            margin-bottom: 24px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.05);
+            animation: shake 0.4s ease;
+        }
+
+        .cyber-alert.success {
+            background-color: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            color: #34d399;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.05);
+        }
+
+        .cyber-alert.info {
+            background-color: rgba(0, 242, 254, 0.07);
+            border: 1px solid rgba(0, 242, 254, 0.25);
+            color: var(--border-cyan);
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.05);
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            75% {
+                transform: translateX(5px);
+            }
+        }
+
+        /* Indicador modo offline */
+        .offline-badge {
+            position: absolute;
+            bottom: 12px;
+            right: 16px;
+            font-size: 0.65rem;
+            color: #10b981;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 0.5px;
+            opacity: 0.8;
+            display: none;
+            align-items: center;
+            gap: 4px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="cyber-card">
+        <!-- Modo offline visual -->
+        <div id="offlineBadge" class="offline-badge">
+            <span class="spinner-grow spinner-grow-sm text-success" style="width: 8px; height: 8px;"></span> Modo local
+            activado
+        </div>
+
+        <div class="d-flex align-items-center mb-2">
+            <div class="icon-header-box">
+                <i id="headerIcon" class="bi bi-shield-lock-fill"></i>
+            </div>
+            <div>
+                <h2 id="cardTitle" class="cyber-title">Crear Cuenta</h2>
+                <div id="cardSubtitle" class="cyber-subtitle">Necesitas una cuenta para guardar tu ensamble</div>
+            </div>
+        </div>
+
+        <!-- Pestañas (Tabs) -->
+        <div class="cyber-tabs" id="tabContainer" data-active="register">
+            <div class="tab-indicator"></div>
+            <button class="cyber-tab-btn active" onclick="switchTab('register')">REGISTRARSE</button>
+            <button class="cyber-tab-btn" onclick="switchTab('login')">INICIAR SESIÓN</button>
+        </div>
+
+        <!-- Alerta de Notificación -->
+        <div id="cyberAlert" class="cyber-alert">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span id="alertText">Error</span>
+        </div>
+
+        <!-- ================= FORMULARIO REGISTRO ================= -->
+        <div id="registerSection" class="form-section active">
+            <form id="formRegistro">
+                <!-- Nombre Completo -->
+                <div class="input-container-custom">
+                    <div class="input-group-label">
+                        <i class="bi bi-person-badge"></i> NOMBRE COMPLETO
+                    </div>
+                    <i class="bi bi-person input-icon"></i>
+                    <input type="text" id="regNombre" class="cyber-input" placeholder="Ej. Juan Ramón López" required>
+                </div>
+
+                <!-- Correo Electrónico -->
+                <div class="input-container-custom">
+                    <div class="input-group-label">
+                        <i class="bi bi-envelope-at"></i> CORREO ELECTRÓNICO
+                    </div>
+                    <i class="bi bi-envelope input-icon"></i>
+                    <input type="email" id="regEmail" class="cyber-input" placeholder="correo@ejemplo.com" required>
+                </div>
+
+                <!-- Contraseña -->
+                <div class="input-container-custom">
+                    <div class="input-group-label">
+                        <i class="bi bi-key"></i> CONTRASEÑA
+                    </div>
+                    <i class="bi bi-key input-icon"></i>
+                    <input type="password" id="regPassword" class="cyber-input" placeholder="Mínimo 6 caracteres"
+                        required>
+                </div>
+
+                <button type="submit" class="btn-cyber-submit">
+                    <i class="bi bi-play-fill"></i> CREAR CUENTA
+                </button>
+            </form>
+
+            <div class="switch-link-container">
+                <a class="switch-link" onclick="switchTab('login')">¿Ya tienes cuenta? Inicia sesión aquí</a>
+            </div>
+        </div>
+
+        <!-- ================= FORMULARIO LOGIN ================= -->
+        <div id="loginSection" class="form-section">
+            <form id="formLogin">
+                <!-- Correo Electrónico -->
+                <div class="input-container-custom">
+                    <div class="input-group-label">
+                        <i class="bi bi-envelope-at"></i> CORREO ELECTRÓNICO
+                    </div>
+                    <i class="bi bi-envelope input-icon"></i>
+                    <input type="email" id="loginEmail" class="cyber-input" placeholder="correo@ejemplo.com" required>
+                </div>
+
+                <!-- Contraseña -->
+                <div class="input-container-custom">
+                    <div class="input-group-label">
+                        <i class="bi bi-key"></i> CONTRASEÑA
+                    </div>
+                    <i class="bi bi-key input-icon"></i>
+                    <input type="password" id="loginPassword" class="cyber-input" placeholder="Ingresa tu contraseña"
+                        required>
+                </div>
+
+                <button type="submit" class="btn-cyber-submit">
+                    <i class="bi bi-box-arrow-in-right"></i> INICIAR SESIÓN
+                </button>
+            </form>
+
+            <div class="switch-link-container">
+                <a class="switch-link" onclick="switchTab('register')">¿No tienes cuenta? Regístrate aquí</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api';
+        let serverOnline = true;
+
+        // Comprobación de estado inicial y conectividad
+        window.addEventListener('DOMContentLoaded', async () => {
+            // Verificar si el backend está activo
+            try {
+                const res = await fetch(`${API_URL}/status`).catch(() => { throw new Error('Offline') });
+                if (!res.ok) throw new Error('Offline');
+                console.log("Conexión con el servidor backend establecida.");
+            } catch (err) {
+                console.warn("Backend desconectado. Entrando en Modo Local Inteligente (LocalStorage).");
+                serverOnline = false;
+                document.getElementById('offlineBadge').style.display = 'flex';
+            }
+        });
+
+        // Alternar entre pestañas
+        function switchTab(tab) {
+            const tabContainer = document.getElementById('tabContainer');
+            const regBtn = tabContainer.children[1];
+            const loginBtn = tabContainer.children[2];
+            const regSection = document.getElementById('registerSection');
+            const loginSection = document.getElementById('loginSection');
+            const cardTitle = document.getElementById('cardTitle');
+            const cardSubtitle = document.getElementById('cardSubtitle');
+            const headerIcon = document.getElementById('headerIcon');
+
+            // Limpiar alertas
+            hideAlert();
+
+            if (tab === 'register') {
+                tabContainer.setAttribute('data-active', 'register');
+                regBtn.classList.add('active');
+                loginBtn.classList.remove('active');
+                regSection.classList.add('active');
+                loginSection.classList.remove('active');
+
+                cardTitle.textContent = "Crear Cuenta";
+                cardSubtitle.textContent = "Necesitas una cuenta para guardar tu ensamble";
+                headerIcon.className = "bi bi-shield-lock-fill";
+            } else {
+                tabContainer.setAttribute('data-active', 'login');
+                regBtn.classList.remove('active');
+                loginBtn.classList.add('active');
+                regSection.classList.remove('active');
+                loginSection.classList.add('active');
+
+                cardTitle.textContent = "Iniciar Sesión";
+                cardSubtitle.textContent = "Accede para recuperar o guardar tus ensambles";
+                headerIcon.className = "bi bi-key-fill";
+            }
+        }
+
+        // Mostrar Alertas Cyber
+        function showAlert(message, type = 'error') {
+            const alertBox = document.getElementById('cyberAlert');
+            const alertText = document.getElementById('alertText');
+
+            alertBox.className = 'cyber-alert';
+            if (type === 'success') {
+                alertBox.classList.add('success');
+                alertBox.querySelector('i').className = 'bi bi-check-circle-fill';
+            } else if (type === 'info') {
+                alertBox.classList.add('info');
+                alertBox.querySelector('i').className = 'bi bi-info-circle-fill';
+            } else {
+                alertBox.querySelector('i').className = 'bi bi-exclamation-triangle-fill';
+            }
+
+            alertText.textContent = message;
+            alertBox.style.display = 'flex';
+
+            // Efecto Shake en errores
+            if (type === 'error') {
+                alertBox.style.animation = 'none';
+                alertBox.offsetHeight; /* Trigger reflow */
+                alertBox.style.animation = 'shake 0.4s ease';
+            }
+        }
+
+        function hideAlert() {
+            document.getElementById('cyberAlert').style.display = 'none';
+        }
+
+        // ================= CLIENTE: REGISTRO DE USUARIO =================
+        document.getElementById('formRegistro').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideAlert();
+
+            const nombre = document.getElementById('regNombre').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const password = document.getElementById('regPassword').value;
+
+            // Validaciones locales antes de enviar
+            if (!nombre || !email || !password) {
+                showAlert('Todos los campos son obligatorios.');
+                return;
+            }
+            if (password.length < 6) {
+                showAlert('La contraseña debe tener al menos 6 caracteres.');
+                return;
+            }
+
+            try {
+                // Si el servidor está activo, intentamos mandar a la API primero
+                if (serverOnline) {
+                    const res = await fetch(`${API_URL}/registro`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ nombre, email, password })
+                    });
+
+                    const data = await res.json();
+
+                    if (res.ok) {
+                        // Sincronizar en local para redundancia
+                        saveLocalUser({ nombre, email, password });
+
+                        showAlert(data.mensaje, 'success');
+                        setTimeout(() => {
+                            switchTab('login');
+                            document.getElementById('loginEmail').value = email;
+                            showAlert('¡Cuenta registrada con éxito! Ingresa tu contraseña para iniciar sesión.', 'info');
+                        }, 1500);
+                    } else {
+                        showAlert(data.error || 'Error al crear la cuenta.');
+                    }
+                } else {
+                    // MODO RESPALDO LOCAL: Validar y guardar en LocalStorage
+                    const localUsers = getLocalUsers();
+                    if (localUsers.some(u => u.email.toLowerCase() === email.toLowerCase())) {
+                        showAlert('Ya existe una cuenta local con ese correo.');
+                        return;
+                    }
+
+                    const newUser = { nombre, email, password };
+                    saveLocalUser(newUser);
+
+                    showAlert('¡Cuenta creada localmente! (Servidor desconectado)', 'success');
+                    setTimeout(() => {
+                        switchTab('login');
+                        document.getElementById('loginEmail').value = email;
+                        showAlert('¡Cuenta local lista! Introduce tu contraseña.', 'info');
+                    }, 1500);
+                }
+            } catch (err) {
+                console.error(err);
+                showAlert('Error al conectar con el servidor.');
+            }
+        });
+
+        // ================= CLIENTE: INICIO DE SESIÓN =================
+        document.getElementById('formLogin').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideAlert();
+
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                showAlert('Correo y contraseña son obligatorios.');
+                return;
+            }
+
+            try {
+                if (serverOnline) {
+                    const res = await fetch(`${API_URL}/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password })
+                    });
+
+                    const data = await res.json();
+
+                    if (res.ok) {
+                        // Guardar datos devueltos en localStorage
+                        localStorage.setItem('token', data.token);
+                        localStorage.setItem('usuario', JSON.stringify(data.usuario));
+
+                        showAlert(data.mensaje || '¡Sesión iniciada con éxito!', 'success');
+                        setTimeout(() => {
+                            window.location.href = 'index.html';
+                        }, 1200);
+                    } else {
+                        // Si falla la API pero tenemos el usuario guardado localmente,
+                        // permitimos inicio de sesión local para salvar la presentación escolar
+                        if (checkLocalLogin(email, password)) {
+                            showAlert('Sesión local iniciada (Fallo del servidor principal).', 'success');
+                            setTimeout(() => {
+                                window.location.href = 'index.html';
+                            }, 1200);
+                        } else {
+                            showAlert(data.error || 'Credenciales incorrectas.');
+                        }
+                    }
+                } else {
+                    // MODO RESPALDO LOCAL
+                    if (checkLocalLogin(email, password)) {
+                        showAlert('Sesión iniciada localmente (Modo local).', 'success');
+                        setTimeout(() => {
+                            window.location.href = 'index.html';
+                        }, 1200);
+                    } else {
+                        showAlert('Correo o contraseña incorrectos en base local.');
+                    }
+                }
+            } catch (err) {
+                console.error(err);
+                // Si la llamada HTTP falla, intentamos respaldo local
+                if (checkLocalLogin(email, password)) {
+                    showAlert('Sesión local iniciada (Servidor desconectado).', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1200);
+                } else {
+                    showAlert('Error de conexión y usuario no encontrado localmente.');
+                }
+            }
+        });
+
+        // Helpers de LocalStorage para resiliencia total
+        function getLocalUsers() {
+            return JSON.parse(localStorage.getItem('local_usuarios')) || [];
+        }
+
+        function saveLocalUser(user) {
+            const users = getLocalUsers();
+            users.push(user);
+            localStorage.setItem('local_usuarios', JSON.stringify(users));
+        }
+
+        function checkLocalLogin(email, password) {
+            const users = getLocalUsers();
+
+            // Usuario por defecto en caso de no tener registro previo
+            if (users.length === 0 && email.toLowerCase() === 'pruebadev179@gmail.com' && password === '123') {
+                const defaultUser = { id: 1, nombre: "Juan", email: email.toLowerCase() };
+                localStorage.setItem('token', 'local_token_jwt_simulado_juan');
+                localStorage.setItem('usuario', JSON.stringify(defaultUser));
+                return true;
+            }
+
+            const found = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
+            if (found) {
+                const sessionUser = { id: Math.floor(Math.random() * 1000) + 10, nombre: found.nombre, email: found.email };
+                localStorage.setItem('token', 'local_token_jwt_simulado_' + sessionUser.id);
+                localStorage.setItem('usuario', JSON.stringify(sessionUser));
+                return true;
+            }
+            return false;
+        }
+    </script>
+</body>
+
+</html>
